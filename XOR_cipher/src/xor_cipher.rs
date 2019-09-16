@@ -1,10 +1,16 @@
 use bigint::BigUint;
 use bigint::RandBigInt;
 
+/// Base 36 radix is used. The message space can only contain the following
+/// characters: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".
+const RADIX: u32 = 36;
+
+/// The bit range for generating a random number.
+const BIT_RANGE: usize = 256;
+
 /// Generates a secret (BigUint) as 256 bits.
 fn generate_secret() -> BigUint {
-    let mut rng = rand::thread_rng();
-    rng.gen_biguint(256)
+    rand::thread_rng().gen_biguint(BIT_RANGE)
 }
 
 /// Encrypts a given a message (bytes) and a secret used as the cipher.
@@ -14,7 +20,7 @@ fn encrypt_message(message: &[u8], secret: &BigUint) -> String {
 
 // Internal helper function, converts a biguint to a string.
 fn big_uint_to_str(message: BigUint) -> String {
-    message.to_str_radix(36)
+    message.to_str_radix(RADIX)
 }
 
 // Internal helper function, encrypts a message given a secret. Since this is a
@@ -25,7 +31,7 @@ fn encrypt(message: BigUint, secret: &BigUint) -> BigUint {
 
 // Internal helper function, parses a message to a BigUint.
 fn bytes_to_biguint(message: &[u8]) -> BigUint {
-    BigUint::parse_bytes(message, 36).expect("failed to parse message while encrypting")
+    BigUint::parse_bytes(message, RADIX).expect("failed to parse message while encrypting")
 }
 
 /// Decrypts a given cipher text (bytes) and a secret.
@@ -112,10 +118,10 @@ mod test {
         // Alice and Bob are communicating with a shared secret (large random
         // number). Eve is attempting to read the message.
         let secret = generate_secret();
-        let message = b"attack";
+        let message = "attack";
 
         // Alice encrypts the messages with the secret.
-        let cipher_text = encrypt_message(message, &secret);
+        let cipher_text = encrypt_message(message.as_bytes(), &secret);
         println!("Encrypted message: {:?}", cipher_text);
 
         // Alice sends the cipher text on an insecure channel to Bob.
@@ -128,7 +134,7 @@ mod test {
         // For brevity, we will limit the exhausitve search.
         for i in 0..1000 {
             let secret_guess = BigUint::from_u32(i).unwrap();
-            if "attack" == decrypt_message(cipher_text.as_bytes(), &secret_guess) {
+            if message == decrypt_message(cipher_text.as_bytes(), &secret_guess) {
                 panic!();
             }
         }
