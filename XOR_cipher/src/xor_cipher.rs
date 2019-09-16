@@ -39,7 +39,7 @@ fn bytes_to_biguint(message: &[u8]) -> BigUint {
 //  Has the same implemenation as `encrypt_message` but for clarity the function
 //  has a different name.
 fn decrypt_message(cipher_text: &[u8], secret: &BigUint) -> String {
-    big_uint_to_str(encrypt(bytes_to_biguint(cipher_text), secret))
+    encrypt_message(cipher_text, secret)
 }
 
 // fn encrypt_message(message: String, secret: BigInt)
