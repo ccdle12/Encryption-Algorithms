@@ -1,3 +1,25 @@
+/// ```
+/// m = plaintext message
+/// c = ciphertext message
+/// Ke = A secret key
+/// m = E(Ke, m) = Encryption function of a secret and message
+/// m = D(Ke, c) = Decryption function of a cipher text given the secret
+/// ```
+///
+/// It is assumed the secret is shared securely.
+/// Both parties use the secret key to encrypt and decrypt messages.
+/// A good encryption function makes it impossible to find `m` given `c`.
+
+/// ```
+///                           Eve
+///                            |
+///                            |  m = D(?, c)
+///                            |
+///                            V
+///     Alice                  c                   Bob
+/// c = E(Ke, m)     -------------------->     m = D(Ke, c)
+/// ```
+
 #[cfg(test)]
 mod test {
     use crypto_kit::XORCipher;
