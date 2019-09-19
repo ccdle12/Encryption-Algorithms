@@ -45,6 +45,9 @@ mod test {
 
         // Eve intercepts the message and attempts to break the cipher.
         // For brevity, we will limit the exhausitve search.
+        // Obviously Eve would not have the plain_text available to compare,
+        // this is purely for educational purposes to demonstrate that given
+        // a large keyspace, it would be difficult to decrypt a cipher text.
         assert!(
             xor_cipher.exhaustive_search(
                 &String::from(message),
