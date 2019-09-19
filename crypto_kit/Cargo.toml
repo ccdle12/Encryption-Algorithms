@@ -1,8 +1,10 @@
 [package]
-name = "xor_cipher"
+name = "crypto_kit"
 version = "0.1.0"
 authors = ["ccdle12 <chris.coverdale24@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-crypto_kit = { path = "../crypto_kit" }
+num-bigint = { version = "0.2", features = ["rand"] }
+rand = "0.5"
+num-traits = "0.2.8"
