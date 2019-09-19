@@ -5,4 +5,4 @@ authors = ["ccdle12 <chris.coverdale24@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-xor_cipher = { path = "../XOR_cipher" }
+crypto_kit = { path = "../crypto_kit" }

@@ -1,3 +1,5 @@
+use crypto_kit::XORCipher;
+
 #[cfg(test)]
 mod tests {
     #[test]

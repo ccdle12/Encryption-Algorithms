@@ -8,3 +8,4 @@ edition = "2018"
 num-bigint = { version = "0.2", features = ["rand"] }
 rand = "0.5"
 num-traits = "0.2.8"
+sha2 = "0.8.0"
