@@ -14,33 +14,32 @@ impl HMAC {
         HMAC { secret }
     }
 
-    /// Creates a message auth `a` given a message and using the secret.
-    /// NOTE(ccdle12): this is a naive implementation.
-    /// Algorithm: H((K' ^ opad) || H((K' ^ ipad) || m))
-    /// 1. outer_xor = (K' ^ opad)
-    /// 2. inner_xor = (K' ^ ipad)
-    /// 3. Concatenate:
-    ///    - inner_concat = inner_xor || m
-    /// 4. Hash inner_concat
-    ///   - ipad_hash = H(inner_concat)
-    /// 5. Concatenate:
-    ///    - preimage = outer_xor || ipad_hash
-    /// 6. Hash the preimage:
-    ///    - a = H(preimage)
-    /// 7. Return the message authentication `a`.
-    ///    - return a.
-    pub fn generate_message_auth() {}
+    // /// Creates a message auth `a` given a message and using the secret.
+    // /// NOTE(ccdle12): this is a naive implementation.
+    // /// Algorithm: H((K' ^ opad) || H((K' ^ ipad) || m))
+    // /// 1. outer_xor = (K' ^ opad)
+    // /// 2. inner_xor = (K' ^ ipad)
+    // /// 3. Concatenate:
+    // ///    - inner_concat = inner_xor || m
+    // /// 4. Hash inner_concat
+    // ///   - ipad_hash = H(inner_concat)
+    // /// 5. Concatenate:
+    // ///    - preimage = outer_xor || ipad_hash
+    // /// 6. Hash the preimage:
+    // ///    - a = H(preimage)
+    // /// 7. Return the message authentication `a`.
+    // ///    - return a.
+    // pub fn generate_message_auth() {}
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::XORCipher;
+    use crate::xor_cipher::generate_secret;
 
     // Helper function to bootstrap alice and bob with a secret key and hmac.
     fn helper_alice_bob_hmac() -> (HMAC, HMAC) {
-        let xor_cipher = XORCipher::new();
-        let secret = xor_cipher.generate_secret();
+        let secret = generate_secret();
 
         let hmac_alice = HMAC::from_existing_secret(secret.clone());
         let hmac_bob = HMAC::from_existing_secret(secret);
@@ -50,8 +49,7 @@ mod tests {
 
     #[test]
     fn init_from_existing_key() {
-        let xor_cipher = XORCipher::new();
-        let secret = xor_cipher.generate_secret();
+        let secret = generate_secret();
 
         let hmac_alice = HMAC::from_existing_secret(secret.clone());
         let hmac_bob = HMAC::from_existing_secret(secret);

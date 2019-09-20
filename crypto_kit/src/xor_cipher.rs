@@ -2,75 +2,57 @@ use bigint::BigUint;
 use bigint::RandBigInt;
 use num_traits::FromPrimitive;
 
-pub struct XORCipher {
-    /// Base 36 radix is used. The message space can only contain the following
-    /// characters: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".
-    radix: u32,
+/// Base 36 radix is used. The message space can only contain the following
+/// characters: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".
+const RADIX: u32 = 36;
 
-    /// The bit range for generating a random number.
-    bit_range: usize,
+/// The bit range for generating a random number.
+const BIT_RANGE: usize = 256;
+
+/// Generates a secret (BigUint) as 256 bits.
+pub fn generate_secret() -> BigUint {
+    rand::thread_rng().gen_biguint(BIT_RANGE)
 }
 
-impl XORCipher {
-    /// Constructor with default values of radix = 36 and bit_range = 256.
-    pub fn new() -> XORCipher {
-        XORCipher {
-            radix: 36,
-            bit_range: 256 as usize,
+/// Encrypts a given a message (bytes) and a secret used as the cipher.
+pub fn encrypt_message(message: &[u8], secret: &BigUint) -> String {
+    big_uint_to_str(encrypt(bytes_to_biguint(message), secret))
+}
+
+// Internal helper function, converts a biguint to a string.
+pub fn big_uint_to_str(message: BigUint) -> String {
+    message.to_str_radix(RADIX)
+}
+
+// Internal helper function, encrypts a message given a secret. Since this is a
+// simple XOR, encryption and decryption are the same.
+pub fn encrypt(message: BigUint, secret: &BigUint) -> BigUint {
+    message ^ secret
+}
+
+// Internal helper function, parses a message to a BigUint.
+pub fn bytes_to_biguint(message: &[u8]) -> BigUint {
+    BigUint::parse_bytes(message, RADIX).expect("failed to parse message while encrypting")
+}
+
+/// Decrypts a given cipher text (bytes) and a secret.
+//  DEV NOTES(ccdle12):
+//  Has the same implemenation as `encrypt_message` but for clarity the function
+//  has a different name.
+pub fn decrypt_message(cipher_text: &[u8], secret: &BigUint) -> String {
+    encrypt_message(cipher_text, secret)
+}
+
+/// A function that demonstrates basic exhaustive_search, not meant to be used
+/// in any real world application.
+pub fn exhaustive_search(message: &String, cipher_text: &String, start: u32, end: u32) -> bool {
+    for i in start..end {
+        let secret_guess = BigUint::from_u32(i).unwrap();
+        if message == &decrypt_message(cipher_text.as_bytes(), &secret_guess) {
+            return true;
         }
     }
-
-    /// Generates a secret (BigUint) as 256 bits.
-    pub fn generate_secret(&self) -> BigUint {
-        rand::thread_rng().gen_biguint(self.bit_range)
-    }
-
-    /// Encrypts a given a message (bytes) and a secret used as the cipher.
-    pub fn encrypt_message(&self, message: &[u8], secret: &BigUint) -> String {
-        self.big_uint_to_str(self.encrypt(self.bytes_to_biguint(message), secret))
-    }
-
-    // Internal helper function, converts a biguint to a string.
-    pub fn big_uint_to_str(&self, message: BigUint) -> String {
-        message.to_str_radix(self.radix)
-    }
-
-    // Internal helper function, encrypts a message given a secret. Since this is a
-    // simple XOR, encryption and decryption are the same.
-    pub fn encrypt(&self, message: BigUint, secret: &BigUint) -> BigUint {
-        message ^ secret
-    }
-
-    // Internal helper function, parses a message to a BigUint.
-    pub fn bytes_to_biguint(&self, message: &[u8]) -> BigUint {
-        BigUint::parse_bytes(message, self.radix).expect("failed to parse message while encrypting")
-    }
-
-    /// Decrypts a given cipher text (bytes) and a secret.
-    //  DEV NOTES(ccdle12):
-    //  Has the same implemenation as `encrypt_message` but for clarity the function
-    //  has a different name.
-    pub fn decrypt_message(&self, cipher_text: &[u8], secret: &BigUint) -> String {
-        self.encrypt_message(cipher_text, secret)
-    }
-
-    /// A function that demonstrates basic exhaustive_search, not meant to be used
-    /// in any real world application.
-    pub fn exhaustive_search(
-        &self,
-        message: &String,
-        cipher_text: &String,
-        start: u32,
-        end: u32,
-    ) -> bool {
-        for i in start..end {
-            let secret_guess = BigUint::from_u32(i).unwrap();
-            if message == &self.decrypt_message(cipher_text.as_bytes(), &secret_guess) {
-                return true;
-            }
-        }
-        false
-    }
+    false
 }
 
 // fn encrypt_message(message: String, secret: BigInt)
@@ -137,17 +119,16 @@ mod test {
     fn big_num_xor() {
         // Alice and Bob are communicating with a shared secret (large random
         // number). Eve is attempting to read the message.
-        let xor_cipher = XORCipher::new();
-        let secret = xor_cipher.generate_secret();
+        let secret = generate_secret();
         let message = "attack";
 
         // Alice encrypts the messages with the secret.
-        let cipher_text = xor_cipher.encrypt_message(message.as_bytes(), &secret);
+        let cipher_text = encrypt_message(message.as_bytes(), &secret);
         println!("Encrypted message: {:?}", cipher_text);
 
         // Alice sends the cipher text on an insecure channel to Bob.
         // Bob receives it and recovers the plaintext.
-        let decrypted_message = xor_cipher.decrypt_message(cipher_text.as_bytes(), &secret);
+        let decrypted_message = decrypt_message(cipher_text.as_bytes(), &secret);
         println!("Decrypted message: {:?}", decrypted_message);
         assert!(decrypted_message == "attack");
 
@@ -155,7 +136,7 @@ mod test {
         // For brevity, we will limit the exhausitve search.
         for i in 0..1000 {
             let secret_guess = BigUint::from_u32(i).unwrap();
-            if message == xor_cipher.decrypt_message(cipher_text.as_bytes(), &secret_guess) {
+            if message == decrypt_message(cipher_text.as_bytes(), &secret_guess) {
                 panic!();
             }
         }

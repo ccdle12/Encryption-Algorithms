@@ -6,7 +6,8 @@ extern crate num_traits;
 extern crate rand;
 
 mod hmac;
-mod xor_cipher;
+pub mod xor_cipher;
 
 pub use hmac::HMAC;
-pub use xor_cipher::XORCipher;
+// pub use xor_cipher::XORCipher;
+// pub use xor_cipher;
