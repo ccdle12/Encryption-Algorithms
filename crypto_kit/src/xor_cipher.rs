@@ -32,7 +32,7 @@ pub fn encrypt(message: BigUint, secret: &BigUint) -> BigUint {
 
 // Internal helper function, parses a message to a BigUint.
 pub fn bytes_to_biguint(message: &[u8]) -> BigUint {
-    BigUint::parse_bytes(message, RADIX).expect("failed to parse message while encrypting")
+    BigUint::parse_bytes(message, RADIX).unwrap()
 }
 
 /// Decrypts a given cipher text (bytes) and a secret.
