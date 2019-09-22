@@ -76,6 +76,13 @@ mod tests {
         let eves_cipher_text: String =
             encrypt_message(&eves_message.as_bytes(), &encryption_secret);
 
+        // Bob decrypts the cipher_text revealing eves altered message.
+        assert_eq!(
+            &eves_message,
+            &decrypt_message(&eves_cipher_text.as_bytes(), &encryption_secret)
+        );
+
+        // Bob needs to prove the message is authentic.
         // Scenario 1. Eve sends the altered message without changing the auth.
         assert_eq!(
             bob_hmac.check_auth(&eves_message.as_bytes(), &auth_hash),
