@@ -40,7 +40,7 @@ mod tests {
     use crypto_kit::HMAC;
 
     #[test]
-    fn it_works() {
+    fn hmac_basic() {
         // Ke and Ka (secrets) are generated.
         let encryption_secret = generate_secret();
         let auth_secret = generate_secret();
