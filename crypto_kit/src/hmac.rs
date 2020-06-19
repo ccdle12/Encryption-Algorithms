@@ -38,21 +38,22 @@ impl HMAC {
     /// 7. Return the message authentication `a`.
     ///    - return a.
     pub fn generate_auth(&self, message: &[u8]) -> Vec<u8> {
-        // Calculate inner and out xor.
-        let outer_xor = &self.secret ^ BigUint::from_bytes_be(&HMAC::OPAD);
-        let inner_xor = &self.secret ^ BigUint::from_bytes_be(&HMAC::IPAD);
+        // 1. + 2. - Calculate the outer and inner xor.
+        let outer_xor: BigUint = &self.secret ^ BigUint::from_bytes_be(&HMAC::OPAD);
+        let inner_xor: BigUint = &self.secret ^ BigUint::from_bytes_be(&HMAC::IPAD);
 
-        // Concatenate inner_xor and the message.
-        // Hash the inner_concat.
+        // 3. Concatenate inner_xor and the message.
         let inner_concat: Vec<u8> = [&inner_xor.to_bytes_be(), message].concat();
+
+        // 4. Hash the inner_concat.
         let mut hasher = Sha256::new();
         hasher.input(inner_concat);
 
-        // Calculate the preimage by concatenating the outer_xor and ipad_hash.
+        // 5. Calculate the preimage by concatenating the outer_xor and ipad_hash.
         let preimage: Vec<u8> =
             [&outer_xor.to_bytes_be(), hasher.result_reset().as_slice()].concat();
 
-        // Hash the preimage and return the HMAC result as Vec<u8>.
+        // 6. + 7. - Hash the preimage and return the HMAC result as Vec<u8>.
         hasher.input(preimage);
         hasher.result().as_slice().to_vec()
     }

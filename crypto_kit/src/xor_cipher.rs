@@ -16,7 +16,10 @@ pub fn generate_secret() -> BigUint {
 
 /// Encrypts a given a message (bytes) and a secret used as the cipher.
 pub fn encrypt_message(message: &[u8], secret: &BigUint) -> String {
-    big_uint_to_str(encrypt(bytes_to_biguint(message), secret))
+    let big_int_message = bytes_to_biguint(message);
+    let cipher_text = encrypt(big_int_message, secret);
+
+    big_uint_to_str(cipher_text)
 }
 
 // Internal helper function, converts a biguint to a string.
@@ -43,18 +46,6 @@ pub fn decrypt_message(cipher_text: &[u8], secret: &BigUint) -> String {
     encrypt_message(cipher_text, secret)
 }
 
-/// A function that demonstrates basic exhaustive_search, not meant to be used
-/// in any real world application.
-pub fn exhaustive_search(message: &String, cipher_text: &String, start: u32, end: u32) -> bool {
-    for i in start..end {
-        let secret_guess = BigUint::from_u32(i).unwrap();
-        if message == &decrypt_message(cipher_text.as_bytes(), &secret_guess) {
-            return true;
-        }
-    }
-    false
-}
-
 // fn encrypt_message(message: String, secret: BigInt)
 #[cfg(test)]
 mod test {
@@ -66,18 +57,20 @@ mod test {
         // Simple random number assumption.
         let mut rng = rand::thread_rng();
         let random_big_num = rng.gen_biguint(1000);
+
         assert!(random_big_num > Zero::zero());
     }
 
     #[test]
     fn simple_biguint_from_u8() {
-        let m = b"attack";
-        let bytes = BigUint::parse_bytes(m, 36).unwrap();
+        let message = b"attack";
+        let bytes = BigUint::parse_bytes(message, 36).unwrap();
     }
 
     #[test]
     fn simple_xor() {
         // Simply xors a message space according a simple secret and decrypts.
+        //
         // **Encryption:**
         // 5  (message):           0000 0101
         // 10 (secret):            0000 1010

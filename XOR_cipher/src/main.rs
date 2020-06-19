@@ -22,9 +22,7 @@
 
 #[cfg(test)]
 mod test {
-    use crypto_kit::xor_cipher::{
-        decrypt_message, encrypt_message, exhaustive_search, generate_secret,
-    };
+    use crypto_kit::xor_cipher::{decrypt_message, encrypt_message, generate_secret};
 
     #[test]
     fn basic_xor_cipher() {
@@ -35,21 +33,10 @@ mod test {
 
         // Alice encrypts the messages with the secret.
         let cipher_text = encrypt_message(message.as_bytes(), &secret);
-        println!("Encrypted message: {:?}", cipher_text);
 
         // Alice sends the cipher text on an insecure channel to Bob.
         // Bob receives it and recovers the plaintext.
         let decrypted_message = decrypt_message(cipher_text.as_bytes(), &secret);
-        println!("Decrypted message: {:?}", decrypted_message);
         assert!(decrypted_message == "attack");
-
-        // Eve intercepts the message and attempts to break the cipher.
-        // For brevity, we will limit the exhausitve search.
-        // Obviously Eve would not have the plain_text available to compare,
-        // this is purely for educational purposes to demonstrate that given
-        // a large keyspace, it would be difficult to decrypt a cipher text.
-        assert!(
-            exhaustive_search(&String::from(message), &String::from(cipher_text), 0, 1000) == false
-        )
     }
 }
